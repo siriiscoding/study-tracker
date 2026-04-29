@@ -36,6 +36,7 @@ const els = {
   startPreview: document.querySelector("#startPreview"),
   sessionList: document.querySelector("#sessionList"),
   emptyState: document.querySelector("#emptyState"),
+  exportCsv: document.querySelector("#exportCsv"),
   clearAll: document.querySelector("#clearAll"),
   monthLabel: document.querySelector("#monthLabel"),
   prevMonth: document.querySelector("#prevMonth"),
@@ -120,6 +121,10 @@ function bindEvents() {
     state.sessions = [];
     save(STORAGE_KEY, state.sessions);
     render();
+  });
+
+  els.exportCsv.addEventListener("click", () => {
+    exportSessionsCsv();
   });
 
   els.sessionList.addEventListener("click", (event) => {
@@ -239,6 +244,7 @@ function renderStreakSummary() {
 function renderSessions() {
   const sessions = [...state.sessions].sort((a, b) => new Date(b.end) - new Date(a.end));
   els.emptyState.hidden = sessions.length > 0;
+  els.exportCsv.disabled = sessions.length === 0;
   els.sessionList.innerHTML = sessions.map((session) => {
     const start = new Date(session.start);
     const end = new Date(session.end);
@@ -253,6 +259,37 @@ function renderSessions() {
       </li>
     `;
   }).join("");
+}
+
+function exportSessionsCsv() {
+  if (!state.sessions.length) return;
+  const sessions = [...state.sessions].sort((a, b) => new Date(a.end) - new Date(b.end));
+  const rows = [
+    ["Date", "Start time", "End time", "Minutes", "Subject", "Topic", "Mode"],
+    ...sessions.map((session) => {
+      const start = new Date(session.start);
+      const end = new Date(session.end);
+      return [
+        dateKey(end),
+        formatTime(start),
+        formatTime(end),
+        session.minutes,
+        sessionSubject(session),
+        sessionTopic(session),
+        session.mode,
+      ];
+    }),
+  ];
+  const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `study-tracker-${dateKey(new Date())}.csv`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function renderCalendar() {
@@ -524,6 +561,11 @@ function formatTime(date) {
 
 function cleanText(value) {
   return value.trim().replace(/\s+/g, " ");
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 function sessionSubject(session) {

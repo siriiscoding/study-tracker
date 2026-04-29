@@ -38,4 +38,5 @@ On Android:
 - Shows recent sessions, calendar totals, seven-day bar graph, subject and topic breakdowns, daily/weekly/monthly goals, streak, and all-time total.
 - Tracks current and best study/reading streaks based on any day with logged time.
 - Shows a celebration when the highlighted goal is complete.
+- Exports the full study log as a CSV file.
 - Works offline after the first successful HTTPS load.

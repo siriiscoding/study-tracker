@@ -118,7 +118,10 @@
         <section class="list-section" aria-label="Full study log">
           <div class="section-heading">
             <h2>Full log</h2>
-            <button class="text-button" id="clearAll" type="button">Clear</button>
+            <div class="log-actions">
+              <button class="text-button" id="exportCsv" type="button">Export CSV</button>
+              <button class="text-button" id="clearAll" type="button">Clear</button>
+            </div>
           </div>
           <div class="empty" id="emptyState">No sessions yet.</div>
           <ol class="sessions" id="sessionList"></ol>

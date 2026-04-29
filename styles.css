@@ -334,6 +334,14 @@ button:disabled {
   font-weight: 750;
 }
 
+.log-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .list-section {
   display: grid;
   gap: 8px;
