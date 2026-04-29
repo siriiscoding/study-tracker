@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f7f3ea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Study">
+    <title>Study Tracker</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app" aria-label="Study tracker">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Today</p>
+          <h1 id="todayTotal">0 min</h1>
+        </div>
+        <button class="icon-button" id="installButton" type="button" hidden aria-label="Install app" title="Install app">
+          <span aria-hidden="true">+</span>
+        </button>
+      </header>
+
+      <section class="goal-strip" aria-label="Goal progress">
+        <div>
+          <p id="goalTitle">Weekly goal</p>
+          <strong id="goalText">720 min</strong>
+        </div>
+        <div class="progress" aria-hidden="true">
+          <span id="goalProgress"></span>
+        </div>
+        <p id="goalStatus">Set a calm target and chip away at it.</p>
+      </section>
+
+      <section class="streak-strip" aria-label="Study and reading streak">
+        <div>
+          <span>Current streak</span>
+          <strong id="currentStreak">0 days</strong>
+        </div>
+        <div>
+          <span>Best streak</span>
+          <strong id="bestStreak">0 days</strong>
+        </div>
+        <p id="streakNudge">Log any reading or study today to start a streak.</p>
+      </section>
+
+      <nav class="tabs" aria-label="App views">
+        <button class="tab active" type="button" data-view="log">Log</button>
+        <button class="tab" type="button" data-view="insights">Insights</button>
+        <button class="tab" type="button" data-view="goals">Goals</button>
+      </nav>
+
+      <section class="view active" id="logView">
+        <section class="panel timer-panel" aria-label="Study timer">
+          <div class="section-heading">
+            <h2>Timer</h2>
+            <span id="timerStatus">Ready</span>
+          </div>
+          <div class="timer-display" id="timerDisplay">00:00:00</div>
+          <div class="timer-actions">
+            <button class="secondary" id="timerStart" type="button">Start</button>
+            <button class="secondary" id="timerStop" type="button" disabled>Use time</button>
+            <button class="text-button" id="timerReset" type="button">Reset</button>
+          </div>
+        </section>
+
+        <form class="panel" id="studyForm">
+          <label>
+            <span>Study time</span>
+            <div class="input-row">
+              <input id="minutes" name="minutes" type="number" min="1" max="1440" inputmode="numeric" placeholder="45" required>
+              <span>min</span>
+            </div>
+          </label>
+
+          <label>
+            <span>End time</span>
+            <input id="endTime" name="endTime" type="datetime-local" required>
+          </label>
+
+          <div class="field-pair">
+            <label>
+              <span>Subject</span>
+              <input id="subject" name="subject" type="text" autocomplete="off" placeholder="Biology" required>
+            </label>
+
+            <label>
+              <span>Mode</span>
+              <select id="mode" name="mode" required>
+                <option value="Read">Read</option>
+                <option value="Listen">Listen</option>
+                <option value="Write">Write</option>
+                <option value="Solve">Solve</option>
+                <option value="Revise">Revise</option>
+                <option value="Watch">Watch</option>
+                <option value="Discuss">Discuss</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            <span>Topic</span>
+            <input id="topic" name="topic" type="text" autocomplete="off" placeholder="Biology chapter 3" required>
+          </label>
+
+          <div class="computed">
+            <span>Start time</span>
+            <strong id="startPreview">-</strong>
+          </div>
+
+          <button class="primary" type="submit">Log study</button>
+        </form>
+
+        <section class="list-section" aria-label="Full study log">
+          <div class="section-heading">
+            <h2>Full log</h2>
+            <button class="text-button" id="clearAll" type="button">Clear</button>
+          </div>
+          <div class="empty" id="emptyState">No sessions yet.</div>
+          <ol class="sessions" id="sessionList"></ol>
+        </section>
+      </section>
+
+      <section class="view" id="insightsView">
+        <section class="panel">
+          <div class="section-heading">
+            <h2 id="monthLabel">Calendar</h2>
+            <div class="month-controls">
+              <button class="mini-button" id="prevMonth" type="button" aria-label="Previous month">‹</button>
+              <button class="mini-button" id="nextMonth" type="button" aria-label="Next month">›</button>
+            </div>
+          </div>
+          <div class="weekdays" aria-hidden="true">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+          <div class="calendar" id="calendar"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <h2>Last 7 days</h2>
+            <span id="weekTotal">0 min</span>
+          </div>
+          <div class="bar-chart" id="barChart" aria-label="Study minutes by day"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Subjects</h2>
+          <div class="subject-breakdown" id="subjectBreakdown"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Topics</h2>
+          <div class="subject-breakdown" id="topicBreakdown"></div>
+        </section>
+      </section>
+
+      <section class="view" id="goalsView">
+        <form class="panel" id="goalForm">
+          <label>
+            <span>Highlight goal</span>
+            <select id="primaryGoal" name="primaryGoal" required>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </label>
+          <label>
+            <span>Daily goal</span>
+            <div class="input-row">
+              <input id="dailyGoal" name="dailyGoal" type="number" min="1" max="1440" inputmode="numeric" required>
+              <span>min</span>
+            </div>
+          </label>
+          <label>
+            <span>Weekly goal</span>
+            <div class="input-row">
+              <input id="weeklyGoal" name="weeklyGoal" type="number" min="1" max="10080" inputmode="numeric" required>
+              <span>min</span>
+            </div>
+          </label>
+          <label>
+            <span>Monthly goal</span>
+            <div class="input-row">
+              <input id="monthlyGoal" name="monthlyGoal" type="number" min="1" max="44640" inputmode="numeric" required>
+              <span>min</span>
+            </div>
+          </label>
+          <button class="primary" type="submit">Save goals</button>
+        </form>
+
+        <section class="panel stats-grid" aria-label="Goal summary">
+          <div>
+            <span>Today</span>
+            <strong id="todayGoalStat">0%</strong>
+          </div>
+          <div>
+            <span>This week</span>
+            <strong id="weekGoalStat">0%</strong>
+          </div>
+          <div>
+            <span>This month</span>
+            <strong id="monthGoalStat">0%</strong>
+          </div>
+          <div>
+            <span>Streak</span>
+            <strong id="streakStat">0 days</strong>
+          </div>
+          <div>
+            <span>Total</span>
+            <strong id="allTimeStat">0 min</strong>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
